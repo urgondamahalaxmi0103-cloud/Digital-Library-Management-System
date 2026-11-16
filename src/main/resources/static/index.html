@@ -1,0 +1,1151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Library Management System</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f4f8;
+    color: #263445;
+}
+
+header {
+    background: #17365d;
+    color: white;
+    padding: 22px;
+    text-align: center;
+}
+
+.container {
+    width: 92%;
+    max-width: 1200px;
+    margin: 25px auto;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+nav button {
+    background: #17365d;
+    color: white;
+    border: none;
+    padding: 11px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+nav button:hover {
+    background: #28558c;
+}
+
+.section {
+    display: none;
+    background: white;
+    padding: 25px;
+    margin-top: 20px;
+    border-radius: 9px;
+    box-shadow: 0 2px 8px #00000012;
+}
+
+.section.active {
+    display: block;
+}
+
+h2 {
+    color: #17365d;
+    margin-top: 0;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 11px;
+    margin: 8px 0 15px;
+    border: 1px solid #ccd3dc;
+    border-radius: 5px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.action {
+    background: #17365d;
+    color: white;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.action:hover {
+    background: #28558c;
+}
+
+.danger {
+    background: #c0392b;
+}
+
+.success {
+    background: #218838;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #dce1e7;
+    text-align: center;
+}
+
+th {
+    background: #17365d;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f5f7fa;
+}
+
+.message {
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.stat {
+    background: #eaf0f8;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat h3 {
+    color: #17365d;
+}
+
+@media(max-width: 700px) {
+    .form-grid, .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        width: 96%;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 7px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Digital Library Management System</h1>
+    <p>Manage Books, Members and Library Activities</p>
+</header>
+
+<div class="container">
+
+<nav>
+    <button onclick="showSection('dashboard')">Dashboard</button>
+    <button onclick="showSection('register')">Register</button>
+    <button onclick="showSection('login')">Login</button>
+    <button onclick="showSection('addBook')">Add New Book</button>
+    <button onclick="showSection('search')">Search Books</button>
+    <button onclick="showSection('available')">Available Books</button>
+    <button onclick="showSection('issue')">Issue Book</button>
+    <button onclick="showSection('issued')">Issued Books</button>
+    <button onclick="showSection('return')">Return Book</button>
+    <button onclick="showSection('reservation')">Reserve Book</button>
+    <button onclick="showSection('contact')">Contact</button>
+    <button onclick="showSection('admin')">Admin Panel</button>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
+    <h2>Dashboard</h2>
+
+    <div class="cards">
+        <div class="stat">
+            <h3>Total Books</h3>
+            <h2 id="totalBooks">0</h2>
+        </div>
+
+        <div class="stat">
+            <h3>Available Books</h3>
+            <h2 id="availableBooks">0</h2>
+        </div>
+
+        <div class="stat">
+            <h3>Logged-in User</h3>
+            <h2 id="currentUser">Guest</h2>
+        </div>
+    </div>
+
+    <p>Welcome to the Digital Library Management System.</p>
+    <p>Use the navigation buttons to manage library activities.</p>
+</div>
+
+<!-- REGISTER -->
+<div id="register" class="section">
+    <h2>Member Registration</h2>
+
+    <form id="registerForm">
+        <label>Full Name</label>
+        <input type="text" id="regName" required>
+
+        <label>Email</label>
+        <input type="email" id="regEmail" required>
+
+        <label>Password</label>
+        <input type="password" id="regPassword" required>
+
+        <button class="action" type="submit">Register</button>
+    </form>
+
+    <p id="registerMessage" class="message"></p>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="section">
+    <h2>Member Login</h2>
+
+    <form id="loginForm">
+        <label>Email</label>
+        <input type="email" id="loginEmail" required>
+
+        <label>Password</label>
+        <input type="password" id="loginPassword" required>
+
+        <button class="action" type="submit">Login</button>
+    </form>
+
+    <p id="loginMessage" class="message"></p>
+    <button class="action danger" onclick="logout()">Logout</button>
+</div>
+
+<!-- ADD BOOK -->
+<div id="addBook" class="section">
+    <h2>Add New Book</h2>
+
+    <form id="addBookForm">
+
+        <div class="form-grid">
+            <div>
+                <label>Book ID</label>
+                <input type="number" id="bookId" required>
+            </div>
+
+            <div>
+                <label>Book Name</label>
+                <input type="text" id="bookName" required>
+            </div>
+
+            <div>
+                <label>Author</label>
+                <input type="text" id="author">
+            </div>
+
+            <div>
+                <label>ISBN</label>
+                <input type="text" id="isbn">
+            </div>
+
+            <div>
+                <label>Category</label>
+                <input type="text" id="category">
+            </div>
+
+            <div>
+                <label>Price</label>
+                <input type="number" id="price" step="0.01" required>
+            </div>
+
+            <div>
+                <label>Quantity</label>
+                <input type="number" id="quantity" min="0" value="1">
+            </div>
+        </div>
+
+        <button class="action" type="submit">Add Book</button>
+    </form>
+
+    <p id="addMessage" class="message"></p>
+</div>
+
+<!-- SEARCH BOOKS -->
+<div id="search" class="section">
+    <h2>Search Books</h2>
+
+    <input type="text" id="searchInput"
+           placeholder="Enter book name or author">
+
+    <button class="action" onclick="searchBooks()">Search</button>
+    <button class="action" onclick="loadBooks()">Show All</button>
+
+    <div id="searchResults"></div>
+</div>
+
+<!-- AVAILABLE BOOKS -->
+<div id="available" class="section">
+    <h2>Available Books</h2>
+
+    <button class="action" onclick="loadBooks()">Refresh Books</button>
+
+    <div style="overflow-x:auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Book Name</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="booksTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ISSUE BOOK -->
+<div id="issue" class="section">
+    <h2>Issue Book</h2>
+
+    <form id="issueForm">
+        <label>Select Book</label>
+        <select id="issueBookId" required>
+            <option value="">Select a book</option>
+        </select>
+
+        <label>Issue Date</label>
+        <input type="date" id="issueDate" required>
+
+        <button class="action" type="submit">Issue Book</button>
+    </form>
+
+    <p id="issueMessage" class="message"></p>
+</div>
+
+<!-- ISSUED BOOKS -->
+<div id="issued" class="section">
+    <h2>Issued Books History</h2>
+
+    <button class="action" onclick="loadIssuedBooks()">Refresh</button>
+
+    <div style="overflow-x:auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Issue ID</th>
+                    <th>Book ID</th>
+                    <th>Book Name</th>
+                    <th>Member Name</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Fine</th>
+                </tr>
+            </thead>
+            <tbody id="issuedTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- RETURN BOOK -->
+<div id="return" class="section">
+    <h2>Return Book</h2>
+
+    <form id="returnForm">
+        <label>Issue ID</label>
+        <input type="number" id="returnIssueId" required>
+
+        <button class="action success" type="submit">Return Book</button>
+    </form>
+
+    <p id="returnMessage" class="message"></p>
+</div>
+
+<!-- RESERVATION -->
+<div id="reservation" class="section">
+    <h2>Book Reservation</h2>
+
+    <form id="reservationForm">
+        <label>Select Book</label>
+        <select id="reservationBookId" required>
+            <option value="">Select a book</option>
+        </select>
+
+        <button class="action" type="submit">Reserve Book</button>
+    </form>
+
+    <p id="reservationMessage" class="message"></p>
+</div>
+
+<!-- CONTACT -->
+<div id="contact" class="section">
+    <h2>Contact Library</h2>
+
+    <form id="contactForm">
+        <label>Name</label>
+        <input type="text" id="contactName" required>
+
+        <label>Email</label>
+        <input type="email" id="contactEmail" required>
+
+        <label>Message</label>
+        <textarea id="contactText" rows="4" required></textarea>
+
+        <button class="action" type="submit">Send Message</button>
+    </form>
+
+    <p id="contactMessage" class="message"></p>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin" class="section">
+    <h2>Admin Panel</h2>
+
+    <h3>Issued Books Details</h3>
+    <button class="action" onclick="loadIssuedBooks()">Refresh Issued Books</button>
+
+    <h3>Library Members</h3>
+    <button class="action" onclick="loadMembers()">View Members</button>
+
+    <div style="overflow-x:auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody id="membersTable"></tbody>
+        </table>
+    </div>
+
+    <h3>Mark Fine as Paid</h3>
+    <form id="fineForm">
+        <label>Issue ID</label>
+        <input type="number" id="fineIssueId" required>
+        <button class="action success" type="submit">Mark Paid</button>
+    </form>
+
+    <p id="fineMessage" class="message"></p>
+
+    <h3>Contact Messages</h3>
+    <button class="action" onclick="loadMessages()">View Messages</button>
+    <div id="messagesList"></div>
+</div>
+
+</div>
+
+<script>
+let books = [];
+let currentUser = null;
+
+function showSection(id) {
+    document.querySelectorAll(".section").forEach(section => {
+        section.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+
+    if (id === "available" || id === "dashboard" ||
+        id === "issue" || id === "reservation") {
+        loadBooks();
+    }
+
+    if (id === "issued") {
+        loadIssuedBooks();
+    }
+}
+
+function getValue(object, ...keys) {
+    for (const key of keys) {
+        if (object[key] !== undefined && object[key] !== null) {
+            return object[key];
+        }
+    }
+    return "";
+}
+
+function getBookId(book) {
+    return getValue(book, "bookid", "bookId", "BOOKID");
+}
+
+function getBookName(book) {
+    return getValue(book, "bookname", "bookName", "BOOKNAME");
+}
+
+function getBookPrice(book) {
+    return getValue(book, "price", "PRICE");
+}
+
+function getQuantity(book) {
+    const value = getValue(book, "quantity", "QUANTITY");
+    return value === "" ? 1 : Number(value);
+}
+
+async function loadBooks() {
+    try {
+        const response = await fetch("/api/catalog");
+
+        if (!response.ok) {
+            throw new Error("Unable to load books");
+        }
+
+        books = await response.json();
+
+        displayBooks(books);
+        populateBookDropdown();
+
+        document.getElementById("totalBooks").innerText = books.length;
+
+        const availableCount = books.filter(book =>
+            getQuantity(book) > 0
+        ).length;
+
+        document.getElementById("availableBooks").innerText =
+            availableCount;
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById("booksTable").innerHTML =
+            "<tr><td colspan='7'>Unable to load books. Check backend.</td></tr>";
+    }
+}
+
+function displayBooks(bookList) {
+    const table = document.getElementById("booksTable");
+    table.innerHTML = "";
+
+    if (!bookList || bookList.length === 0) {
+        table.innerHTML =
+            "<tr><td colspan='7'>No books found</td></tr>";
+        return;
+    }
+
+    bookList.forEach(book => {
+        const quantity = getQuantity(book);
+
+        const row = document.createElement("tr");
+
+        const values = [
+            getBookId(book),
+            getBookName(book),
+            getValue(book, "author", "AUTHOR"),
+            getValue(book, "category", "CATEGORY"),
+            getBookPrice(book),
+            quantity,
+            quantity > 0 ? "Available" : "Out of Stock"
+        ];
+
+        values.forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        table.appendChild(row);
+    });
+}
+
+function populateBookDropdown() {
+    const issueSelect = document.getElementById("issueBookId");
+    const reservationSelect =
+        document.getElementById("reservationBookId");
+
+    issueSelect.innerHTML = '<option value="">Select a book</option>';
+    reservationSelect.innerHTML =
+        '<option value="">Select a book</option>';
+
+    books.forEach(book => {
+        if (getQuantity(book) > 0) {
+            const id = getBookId(book);
+            const name = getBookName(book);
+
+            const option1 = document.createElement("option");
+            option1.value = id;
+            option1.textContent = name;
+            issueSelect.appendChild(option1);
+
+            const option2 = document.createElement("option");
+            option2.value = id;
+            option2.textContent = name;
+            reservationSelect.appendChild(option2);
+        }
+    });
+}
+
+async function searchBooks() {
+    const search = document.getElementById("searchInput").value.trim();
+
+    try {
+        const response = await fetch(
+            "/api/catalog?search=" + encodeURIComponent(search)
+        );
+
+        if (!response.ok) {
+            throw new Error("Search failed");
+        }
+
+        const results = await response.json();
+        const container = document.getElementById("searchResults");
+
+        if (results.length === 0) {
+            container.innerHTML = "<p>No books found.</p>";
+            return;
+        }
+
+        let html = `
+            <table>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Book Name</th>
+                    <th>Author</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                </tr>`;
+
+        results.forEach(book => {
+            html += `
+                <tr>
+                    <td>${getBookId(book)}</td>
+                    <td>${escapeHTML(getBookName(book))}</td>
+                    <td>${escapeHTML(getValue(book, "author", "AUTHOR"))}</td>
+                    <td>${getBookPrice(book)}</td>
+                    <td>${getQuantity(book)}</td>
+                </tr>`;
+        });
+
+        container.innerHTML = html + "</table>";
+
+    } catch (error) {
+        document.getElementById("searchResults").innerText =
+            "Search failed. Check backend.";
+    }
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+// REGISTER
+
+document.getElementById("registerForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    const data = {
+        fullName: document.getElementById("regName").value,
+        email: document.getElementById("regEmail").value,
+        password: document.getElementById("regPassword").value
+    };
+
+    try {
+        const response = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.text();
+
+        if (!response.ok) {
+            throw new Error(result);
+        }
+
+        document.getElementById("registerMessage").innerText = result;
+
+        document.getElementById("registerForm").reset();
+
+        if (typeof loadMembers === "function") {
+            loadMembers();
+        }
+
+    } catch (error) {
+        document.getElementById("registerMessage").innerText =
+            error.message;
+    }
+});
+
+
+
+// LOGIN
+
+document.getElementById("loginForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    const data = {
+        email: document.getElementById("loginEmail").value,
+        password: document.getElementById("loginPassword").value
+    };
+
+    try {
+        const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+
+        const responseText = await response.text();
+
+        let result;
+
+        try {
+            result = JSON.parse(responseText);
+        } catch {
+            result = responseText;
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                typeof result === "string"
+                    ? result
+                    : result.message || "Invalid login"
+            );
+        }
+
+        currentUser = result;
+
+        document.getElementById("currentUser").innerText =
+            getValue(result, "fullName", "name", "FULL_NAME") || "Member";
+
+        document.getElementById("loginMessage").innerText =
+            "Login successful!";
+
+    } catch (error) {
+        document.getElementById("loginMessage").innerText =
+            error.message || "Login failed.";
+    }
+});
+
+
+function logout() {
+    currentUser = null;
+    document.getElementById("currentUser").innerText = "Guest";
+    document.getElementById("loginMessage").innerText =
+        "You have logged out.";
+}
+
+// ADD BOOK
+document.getElementById("addBookForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    const data = {
+        bookid: Number(document.getElementById("bookId").value),
+        bookname: document.getElementById("bookName").value,
+        author: document.getElementById("author").value,
+        isbn: document.getElementById("isbn").value,
+        category: document.getElementById("category").value,
+        price: Number(document.getElementById("price").value),
+        quantity: Number(document.getElementById("quantity").value)
+    };
+
+    try {
+        const response = await fetch("/api/admin/books", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+const result = await response.text();
+
+if (!response.ok) {
+    throw new Error(result);
+}
+
+document.getElementById("addMessage").innerText =
+    result || "Book added successfully!";
+
+document.getElementById("addBookForm").reset();
+
+loadBooks();
+
+    } catch (error) {
+        document.getElementById("addMessage").innerText =
+            error.message || "Error adding book.";
+    }
+});
+
+// ISSUE BOOK
+document.getElementById("issueForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    if (!currentUser) {
+        document.getElementById("issueMessage").innerText =
+            "Please login before issuing a book.";
+        return;
+    }
+
+    const data = {
+        bookId: Number(document.getElementById("issueBookId").value),
+        userId: Number(getValue(currentUser, "userId", "userid", "USER_ID"))
+    };
+
+    try {
+        const response = await fetch("/api/library/issue", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.text();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Issue failed");
+        }
+
+        document.getElementById("issueMessage").innerText =
+            result.message || "Book issued successfully!";
+
+        loadBooks();
+
+    } catch (error) {
+        document.getElementById("issueMessage").innerText =
+            error.message || "Unable to issue book.";
+    }
+});
+
+// ISSUED BOOKS
+async function loadIssuedBooks() {
+    try {
+        const response = await fetch("/api/admin/issued-books");
+
+        if (!response.ok) {
+            throw new Error("Unable to load issued books");
+        }
+
+        const list = await response.json();
+        const table = document.getElementById("issuedTable");
+
+        table.innerHTML = "";
+
+        if (list.length === 0) {
+            table.innerHTML =
+                "<tr><td colspan='8'>No issued books found</td></tr>";
+            return;
+        }
+
+        list.forEach(item => {
+            const row = document.createElement("tr");
+
+            const values = [
+                getValue(item, "issueId", "ISSUEID"),
+                getValue(item, "bookId", "BOOKID"),
+                getValue(item, "bookName", "BOOKNAME"),
+                getValue(item, "fullName", "FULL_NAME"),
+                getValue(item, "issuedDate", "ISSUEDDATE"),
+                getValue(item, "dueDate", "DUEDATE"),
+                getValue(item, "status", "STATUS"),
+                getValue(item, "fineAmount", "FINEAMOUNT")
+            ];
+
+            values.forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            table.appendChild(row);
+        });
+
+    } catch (error) {
+        document.getElementById("issuedTable").innerHTML =
+            "<tr><td colspan='8'>Unable to load issued books.</td></tr>";
+    }
+}
+
+// RETURN BOOK
+document.getElementById("returnForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    if (!currentUser) {
+        document.getElementById("returnMessage").innerText =
+            "Please login first.";
+        return;
+    }
+
+    const issueId = document.getElementById("returnIssueId").value;
+
+    const userId = Number(
+        getValue(currentUser, "userId", "userid", "USER_ID")
+    );
+
+    try {
+        const response = await fetch(
+            "/api/library/return/" + issueId,
+            {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({userId: userId})
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Return failed");
+        }
+
+        document.getElementById("returnMessage").innerText =
+            result.message || "Book returned successfully!";
+
+        loadBooks();
+        loadIssuedBooks();
+
+    } catch (error) {
+        document.getElementById("returnMessage").innerText =
+            error.message || "Unable to return book.";
+    }
+});
+
+// RESERVATION
+document.getElementById("reservationForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    if (!currentUser) {
+        document.getElementById("reservationMessage").innerText =
+            "Please login first.";
+        return;
+    }
+
+    const data = {
+        userId: Number(
+            getValue(currentUser, "userId", "userid", "USER_ID")
+        ),
+        bookId: Number(
+            document.getElementById("reservationBookId").value
+        )
+    };
+
+    try {
+        const response = await fetch("/api/reservations", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Reservation failed");
+        }
+
+        document.getElementById("reservationMessage").innerText =
+            result.message || "Book reserved successfully!";
+
+    } catch (error) {
+        document.getElementById("reservationMessage").innerText =
+            error.message || "Reservation failed.";
+    }
+});
+
+// CONTACT
+document.getElementById("contactForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    const data = {
+        name: document.getElementById("contactName").value,
+        email: document.getElementById("contactEmail").value,
+        message: document.getElementById("contactText").value
+    };
+
+    try {
+        const response = await fetch("/api/contact", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Message not sent");
+        }
+
+        document.getElementById("contactMessage").innerText =
+            result.message || "Message sent successfully!";
+
+        document.getElementById("contactForm").reset();
+
+    } catch (error) {
+        document.getElementById("contactMessage").innerText =
+            error.message || "Unable to send message.";
+    }
+});
+
+// ADMIN: MEMBERS
+async function loadMembers() {
+    try {
+        const response = await fetch("/api/admin/members");
+
+        if (!response.ok) {
+            throw new Error("Unable to load members");
+        }
+
+        const members = await response.json();
+        const table = document.getElementById("membersTable");
+
+        table.innerHTML = "";
+
+        members.forEach(member => {
+            const row = document.createElement("tr");
+
+            const values = [
+                getValue(member, "userId", "USER_ID"),
+                getValue(member, "fullName", "FULL_NAME"),
+                getValue(member, "email", "EMAIL"),
+                getValue(member, "role", "ROLE")
+            ];
+
+            values.forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            table.appendChild(row);
+        });
+
+        if (members.length === 0) {
+            table.innerHTML =
+                "<tr><td colspan='4'>No members found</td></tr>";
+        }
+
+    } catch (error) {
+        document.getElementById("membersTable").innerHTML =
+            "<tr><td colspan='4'>Unable to load members.</td></tr>";
+    }
+}
+
+// ADMIN: FINE PAYMENT
+document.getElementById("fineForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    const issueId = document.getElementById("fineIssueId").value;
+
+    try {
+        const response = await fetch(
+            "/api/admin/fines/" + issueId + "/paid",
+            {method: "PUT"}
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Update failed");
+        }
+
+        document.getElementById("fineMessage").innerText =
+            result.message || "Fine marked as paid.";
+
+        loadIssuedBooks();
+
+    } catch (error) {
+        document.getElementById("fineMessage").innerText =
+            error.message || "Unable to update fine.";
+    }
+});
+
+// ADMIN: CONTACT MESSAGES
+async function loadMessages() {
+    try {
+        const response = await fetch("/api/admin/contact-messages");
+
+        if (!response.ok) {
+            throw new Error("Unable to load messages");
+        }
+
+        const messages = await response.json();
+        const container = document.getElementById("messagesList");
+
+        container.innerHTML = "";
+
+        if (messages.length === 0) {
+            container.innerText = "No contact messages.";
+            return;
+        }
+
+        messages.forEach(message => {
+            const div = document.createElement("div");
+            div.className = "stat";
+
+            const name = getValue(message, "name", "NAME");
+            const email = getValue(message, "email", "EMAIL");
+            const messageText = getValue(message, "message", "MESSAGE");
+
+            div.innerHTML =
+                "<strong>" + escapeHTML(name) + "</strong><br>" +
+                escapeHTML(email) + "<p>" +
+                escapeHTML(messageText) + "</p>";
+
+            container.appendChild(div);
+        });
+
+    } catch (error) {
+        document.getElementById("messagesList").innerText =
+            "Unable to load messages.";
+    }
+}
+
+// SET TODAY'S DATE
+document.getElementById("issueDate").value =
+    new Date().toISOString().split("T")[0];
+
+// INITIAL LOAD
+loadBooks();
+</script>
+
+</body>
+</html>
